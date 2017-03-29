@@ -6,7 +6,6 @@ from sklearn.metrics import f1_score, make_scorer, accuracy_score
 
 import numpy as np
 import pandas as pd
-from parameter_config import *
 from parameter_tune import ParameterTune
 
 
@@ -15,8 +14,7 @@ y = df["y"].values
 df = df.drop("y",axis=1)
 x = df.values
 
-hs = gradient_boost_config
-pt = ParameterTune(GradientBoostingClassifier,hs,x,y)
+pt = ParameterTune(GradientBoostingClassifier,"gradientboost",x,y)
 #hs = logistic_config
 #pt = ParameterTune(LogisticRegression,hs,x,y)
 pt.run(10, 0.5, 0.3, 10)

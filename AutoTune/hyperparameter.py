@@ -1,5 +1,5 @@
 import numpy as np
-from gray import gray2binary
+from .gray import gray2binary
 
 class Hyperparameter():
     def __init__(self, config):

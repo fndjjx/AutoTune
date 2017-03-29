@@ -4,14 +4,21 @@ import random
 import pandas as pd
 from sklearn.cross_validation import cross_val_score
 import numpy as np
-from hyperparameter import Hyperparameter
-from parameter_config import *
 from sklearn.metrics import f1_score, make_scorer, accuracy_score
 
+from .hyperparameter import Hyperparameter
+from .parameter_config import *
+
+supported_algo = {"logistic": logistic_config, "gradientboost": gradient_boost_config}
 
 class ParameterTune():
 
-    def __init__(self, algo, parameter_space, x, y):
+    def __init__(self, algo, parameter_type, x, y):
+        if parameter_type not in supported_algo:
+            raise NotImplementedError
+
+        parameter_space = supported_algo[parameter_type]
+
         self.h = Hyperparameter(parameter_space)
         map_length = self.h.parse_config()
 
