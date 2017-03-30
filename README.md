@@ -4,7 +4,7 @@ A python tool to automaticly adjust hyperparameters for sklearn algorithm.
 ## Install
 `python setup install`
 ## Usage
-```>>> import AutoTune
+```>>> import autotune
 >>> import pandas as pd
 >>> from sklearn.linear_model import LogisticRegression
 >>> df = pd.read_csv("train.csv")
@@ -12,7 +12,7 @@ A python tool to automaticly adjust hyperparameters for sklearn algorithm.
 >>> df = df.drop("target",axis=1)
 >>> x = df.values
 >>> 
->>> at=AutoTune.ParameterTune(LogisticRegression, "logistic",x,y)
+>>> at=autotune.ParameterTune(LogisticRegression, "logistic",x,y)
 >>> at.run(pop_num=10, cxpb=0.5, mutpb=0.3, gen_num=10)     
 ...
 >>> at.get_best(1)
