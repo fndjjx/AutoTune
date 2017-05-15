@@ -14,7 +14,15 @@ supported_algo = {"logistic": logistic_config, "gradientboost": gradient_boost_c
 
 class ParameterTune():
 
-    def __init__(self, algo, parameter_type, x, y, kbest=100):
+    def __init__(self, algo, x, y, kbest=100):
+        if "XGBClassifier" in str(algo):
+            parameter_type = "xgboost"
+        elif "LogisticRegression" in str(algo):
+            parameter_type = "logistic"
+        elif "RandomForestClassifier" in str(algo):
+            parameter_type = "randomforest"
+        elif "GradientBoostingClassifier" in str(algo):
+            parameter_type = "gradientboost"
         if parameter_type not in supported_algo:
             raise NotImplementedError
 
