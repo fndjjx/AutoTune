@@ -3,9 +3,8 @@ from .gray import gray2binary
 
 class Hyperparameter():
     def __init__(self, config):
+        print(config)
         self.config = config
-        self.algo = config["algo"]
-        del self.config["algo"]
         self.mapping = []
     def parse_config(self):
         index_count = 0
