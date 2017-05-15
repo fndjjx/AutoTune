@@ -1,5 +1,6 @@
 
 from deap import creator, base, tools, algorithms
+import multiprocessing
 import random
 import pandas as pd
 from sklearn.cross_validation import cross_val_score
@@ -9,11 +10,11 @@ from sklearn.metrics import f1_score, make_scorer, accuracy_score
 from .hyperparameter import Hyperparameter
 from .parameter_config import *
 
-supported_algo = {"logistic": logistic_config, "gradientboost": gradient_boost_config}
+supported_algo = {"logistic": logistic_config, "gradientboost": gradient_boost_config, "xgboost":xgboost_config, "randomforest":random_forest_config}
 
 class ParameterTune():
 
-    def __init__(self, algo, parameter_type, x, y):
+    def __init__(self, algo, parameter_type, x, y, kbest=100):
         if parameter_type not in supported_algo:
             raise NotImplementedError
 
@@ -32,7 +33,7 @@ class ParameterTune():
 
         toolbox.register("mate", tools.cxTwoPoint)
         toolbox.register("mutate", tools.mutFlipBit, indpb=0.05)
-        toolbox.register("select", tools.selTournament, tournsize=3)
+        toolbox.register("select", tools.selTournament, tournsize=kbest)
 
         self.toolbox = toolbox
         self.x = x
@@ -46,12 +47,11 @@ class ParameterTune():
         self.count += 1
         print(self.count)
         print(configuration)
-        scorer = make_scorer(f1_score)
         scorer = make_scorer(accuracy_score)
         if configuration:
             try:
                 clf = self.algo(**configuration)
-                score = np.mean(cross_val_score(clf, self.x, self.y, scoring=scorer))
+                score = np.mean(cross_val_score(clf, self.x, self.y, scoring=scorer, cv=5))
                 print(score)
                 return score,
             except Exception as err:
