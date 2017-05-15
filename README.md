@@ -4,7 +4,8 @@ A python tool to automaticly adjust hyperparameters for sklearn algorithm.
 ## Install
 `python setup install`
 ## Usage
-```>>> import autotune
+```
+>>> import autotune
 >>> import pandas as pd
 >>> from sklearn.linear_model import LogisticRegression
 >>> df = pd.read_csv("train.csv")
