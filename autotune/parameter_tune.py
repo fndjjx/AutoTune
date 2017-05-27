@@ -14,8 +14,8 @@ supported_algo = {"logistic": logistic_config, "gradientboost": gradient_boost_c
 
 class ParameterTune():
 
-    def __init__(self, algo, x, y, kbest=100):
-        if "XGBClassifier" in str(algo):
+    def __init__(self, algo, x, y, metric, metric_direction, kbest=100):
+        if "XGBClassifier" in str(algo) or "XGBRegressor" in str(algo):
             parameter_type = "xgboost"
         elif "LogisticRegression" in str(algo):
             parameter_type = "logistic"
@@ -26,12 +26,14 @@ class ParameterTune():
         if parameter_type not in supported_algo:
             raise NotImplementedError
 
+        self.metric = metric
+        self.metric_direction = metric_direction
         parameter_space = supported_algo[parameter_type]
 
         self.h = Hyperparameter(parameter_space)
         map_length = self.h.parse_config()
 
-        creator.create("FitnessMax", base.Fitness, weights=(1.0,))
+        creator.create("FitnessMax", base.Fitness, weights=(metric_direction,))
         creator.create("Individual", list, fitness=creator.FitnessMax)
         toolbox = base.Toolbox()
         toolbox.register("attr_bool", random.randint, 0, 1)
@@ -55,12 +57,16 @@ class ParameterTune():
         self.count += 1
         print(self.count)
         print(configuration)
-        scorer = make_scorer(accuracy_score)
+        scorer = make_scorer(self.metric)
         if configuration:
             try:
                 clf = self.algo(**configuration)
-                score = np.mean(cross_val_score(clf, self.x, self.y, scoring=scorer, cv=5))
+                scores = cross_val_score(clf, self.x, self.y, scoring=scorer, cv=5)
+                score = np.mean(scores)
+                print(scores)
                 print(score)
+                if str(score) == "nan":
+                    return 0,
                 return score,
             except Exception as err:
                 print(err)
@@ -75,7 +81,10 @@ class ParameterTune():
 
     def get_best(self, k):
         fits = [(ind.fitness.values[0],ind) for ind in self.pop]
-        fits.sort(key=lambda x:x[0])
+        if self.metric_direction == 1:
+            fits.sort(key=lambda x:x[0])
+        else:
+            fits.sort(key=lambda x:x[0], reverse=True)
         
         best_inds = fits[-k:]
         configurations = []
