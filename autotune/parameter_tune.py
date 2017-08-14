@@ -10,7 +10,7 @@ from sklearn.metrics import f1_score, make_scorer, accuracy_score
 from .hyperparameter import Hyperparameter
 from .parameter_config import *
 
-supported_algo = {"logistic": logistic_config, "gradientboost": gradient_boost_config, "xgboost":xgboost_config, "randomforest":random_forest_config}
+supported_algo = {"logistic": logistic_config, "gradientboost": gradient_boost_config, "xgboost":xgboost_config, "randomforest":random_forest_config, "randomforest_reg":random_forest_reg_config}
 
 class ParameterTune():
 
@@ -19,10 +19,13 @@ class ParameterTune():
             parameter_type = "xgboost"
         elif "LogisticRegression" in str(algo):
             parameter_type = "logistic"
-        elif "RandomForestClassifier" in str(algo):
+        elif "RandomForestClassifier"  in str(algo):
             parameter_type = "randomforest"
         elif "GradientBoostingClassifier" in str(algo):
             parameter_type = "gradientboost"
+        elif "RandomForestRegressor" in str(algo):
+            parameter_type = "randomforest_reg"
+
         if parameter_type not in supported_algo:
             raise NotImplementedError
 
@@ -58,6 +61,10 @@ class ParameterTune():
         print(self.count)
         print(configuration)
         scorer = make_scorer(self.metric)
+        if self.metric_direction == 1:
+            not_possible_value = -np.inf
+        else:
+            not_possible_value =  np.inf
         if configuration:
             try:
                 clf = self.algo(**configuration)
@@ -66,13 +73,13 @@ class ParameterTune():
                 print(scores)
                 print(score)
                 if str(score) == "nan":
-                    return 0,
+                    return not_possible_value,
                 return score,
             except Exception as err:
                 print(err)
-                return 0,
+                return not_possible_value,
         else:
-            return 0,
+            return not_possible_value,
 
     def run(self, pop_num, cxpb, mutpb, gen_num):
         self.toolbox.register("evaluate", self.eval_performance)
