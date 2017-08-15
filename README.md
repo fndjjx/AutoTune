@@ -13,7 +13,7 @@ A python tool to automaticly adjust hyperparameters for sklearn algorithm.
 >>> df = df.drop("target",axis=1)
 >>> x = df.values
 >>> 
->>> at=autotune.ParameterTune(LogisticRegression,x,y)
+>>> at=autotune.ParameterTune(LogisticRegression,x,y,roc_auc_score,1)
 >>> at.run(pop_num=10, cxpb=0.5, mutpb=0.3, gen_num=10)     
 ...
 >>> at.get_best(1)
